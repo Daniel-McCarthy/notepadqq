@@ -60,6 +60,9 @@ void EditorTabWidget::connectEditorSignals(Editor *editor)
 
     connect(editor, &Editor::fileNameChanged,
             this, &EditorTabWidget::on_fileNameChanged);
+
+    connect(this, &EditorTabWidget::currentChanged,
+            this, &EditorTabWidget::on_currentTabChanged);
 }
 
 void EditorTabWidget::disconnectEditorSignals(Editor *editor)
@@ -74,6 +77,9 @@ void EditorTabWidget::disconnectEditorSignals(Editor *editor)
 
     disconnect(editor, &Editor::fileNameChanged,
                this, &EditorTabWidget::on_fileNameChanged);
+
+    disconnect(this, &EditorTabWidget::currentChanged,
+            this, &EditorTabWidget::on_currentTabChanged);
 }
 
 
@@ -354,4 +360,18 @@ void EditorTabWidget::on_fileNameChanged(const QUrl & /*oldFileName*/, const QUr
 
     setTabText(index, fileName);
     setTabToolTip(index, fullFileName);
+}
+
+int EditorTabWidget::formerTabIndex()
+{
+    return m_formerTabIndex;
+}
+
+void EditorTabWidget::on_currentTabChanged(int index)
+{
+    // Store current index to become former index on next tab change.
+    if(m_mostRecentTabIndex != index) {
+        m_formerTabIndex = m_mostRecentTabIndex;
+        m_mostRecentTabIndex = index;
+    }
 }
